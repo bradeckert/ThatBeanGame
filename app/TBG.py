@@ -22,15 +22,21 @@ clients: Dict[str, str] = {}
 if 'TBG_CLIENT_ORIGIN' in os.environ:
     CLIENT_ORIGIN = os.environ['TBG_CLIENT_ORIGIN']
 
+print("blah", os.environ)
+
 @socketio.on('login')
 def on_login(login_info):
     try:
         game: Game = games[login_info['game']]
         player: Player = [player for player in game.players if player.token == login_info['token']][0]
-    except KeyError:
+    except KeyError as e:
+        print('login_info')
+        print(e)
         socketio.emit('error', 'Socket connection must start with sending of token (cookie) and game (id) in JSON format')
         return
-    except IndexError:
+    except IndexError as e:
+        print('login_info')
+        print(e)
         socketio.emit('error', 'User does not exist')
         return
     player.socket_sid = request.sid
@@ -63,12 +69,14 @@ def update_client(game):
 def error_check(result: Dict) -> Dict:
     '''Aborts with 400 if result is error'''
     if result.get('error'):
+        print(result)
         abort(400, result)
     return result
 
 
 @app.errorhandler(400)
 def error400(err):
+    print(err)
     return jsonify(err.description), 400
 
 
@@ -77,7 +85,7 @@ def enable_cors(response):
     '''Verifies server responds to all requests'''
     
     if CLIENT_ORIGIN:
-        response.headers['Access-Control-Allow-Origin'] = CLIENT_ORIGIN
+        response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Credentials'] = 'true'
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token, user-agent'
@@ -309,4 +317,4 @@ def buy_field(game: Game, player: Player) -> Dict:
     return jsonify(result)
 
 print("Server starting...")
-socketio.run(app, '0.0.0.0', 8080)
+socketio.run(app, '0.0.0.0', 8000)
