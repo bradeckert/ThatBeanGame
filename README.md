@@ -16,6 +16,9 @@ This game is also being automatically built on Docker Hub. To run the docker con
 
 *Current status*: partially working
 
+## Client
+access at `http://192.168.1.121:8000/static/index.html`
+
 ## Documentation
 Documentation (including API) can be found at: http://thatbeangame.readthedocs.io
 
